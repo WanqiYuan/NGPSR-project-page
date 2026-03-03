@@ -177,6 +177,84 @@
     ]
   }
   </script>
+
+  <!-- Video Comparison Slider (before/after) -->
+  <style>
+    .vcmp-grid-title { margin-top: 0.25rem; }
+    .vcmp-grid { margin-top: 1.25rem; }
+    .vcmp {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      border-radius: 12px;
+      background: #000;
+      touch-action: none;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+    }
+    .vcmp video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      user-select: none;
+      pointer-events: none;
+    }
+    .vcmp video.vcmp-top {
+      clip-path: inset(0 50% 0 0);
+    }
+    .vcmp .vcmp-bar {
+      position: absolute;
+      top: 0; bottom: 0;
+      left: 50%;
+      width: 3px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.35);
+    }
+    .vcmp .vcmp-knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      width: 36px; height: 36px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      display: grid;
+      place-items: center;
+      font: 700 14px/1 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color: #111;
+    }
+    .vcmp .vcmp-labels {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      pointer-events: none;
+      font: 600 12px/1.1 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+    .vcmp .vcmp-labels span {
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.55);
+      color: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+    }
+    .vcmp-caption {
+      margin-top: 0.45rem;
+      margin-bottom: 1.25rem;
+      font-size: 0.95rem;
+      color: rgba(0,0,0,0.75);
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .vcmp { scroll-behavior: auto; }
+    }
+  </style>
+
 </head>
 <body>
 
@@ -187,52 +265,7 @@
   </button>
 
   <!-- More Works Dropdown -->
-  <div class="more-works-container">
-    <button class="more-works-btn" onclick="toggleMoreWorks()" title="View More Works from Our Lab">
-      <i class="fas fa-flask"></i>
-      More Works
-      <i class="fas fa-chevron-down dropdown-arrow"></i>
-    </button>
-    <div class="more-works-dropdown" id="moreWorksDropdown">
-      <div class="dropdown-header">
-        <h4>More Works from Our Lab</h4>
-        <button class="close-btn" onclick="toggleMoreWorks()">
-          <i class="fas fa-times"></i>
-        </button>
-      </div>
-      <div class="works-list">
-        <!-- TODO: Replace with your lab's related works -->
-        <a href="https://arxiv.org/abs/PAPER_ID_1" class="work-item" target="_blank">
-          <div class="work-info">
-            <!-- TODO: Replace with actual paper title -->
-            <h5>Paper Title 1</h5>
-            <!-- TODO: Replace with brief description -->
-            <p>Brief description of the work and its main contribution.</p>
-            <!-- TODO: Replace with venue and year -->
-            <span class="work-venue">Conference/Journal 2024</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <!-- TODO: Add more related works or remove extra items -->
-        <a href="https://arxiv.org/abs/PAPER_ID_2" class="work-item" target="_blank">
-          <div class="work-info">
-            <h5>Paper Title 2</h5>
-            <p>Brief description of the work and its main contribution.</p>
-            <span class="work-venue">Conference/Journal 2023</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-        <a href="https://arxiv.org/abs/PAPER_ID_3" class="work-item" target="_blank">
-          <div class="work-info">
-            <h5>Paper Title 3</h5>
-            <p>Brief description of the work and its main contribution.</p>
-            <span class="work-venue">Conference/Journal 2023</span>
-          </div>
-          <i class="fas fa-external-link-alt"></i>
-        </a>
-      </div>
-    </div>
-  </div>
+  
 
   <main id="main-content">
   <section class="hero">
@@ -351,126 +384,89 @@
 <!-- End paper abstract -->
 
 
-<!-- Image carousel -->
-<section class="hero is-small">
-  <div class="hero-body">
-    <div class="container">
-      <div id="results-carousel" class="carousel results-carousel">
-       <div class="item">
-        <!-- TODO: Replace with your research result images -->
-        <img src="static/images/carousel1.jpg" alt="First research result visualization" loading="lazy"/>
-        <!-- TODO: Replace with description of this result -->
-        <h2 class="subtitle has-text-centered">
-          First image description.
-        </h2>
+<!-- Video comparison sliders (6) -->
+<section class="section">
+  <div class="container is-max-desktop">
+    <h2 class="title is-3 has-text-centered vcmp-grid-title">Comparisons</h2>
+    <div class="columns is-variable is-5 vcmp-grid">
+
+      <!-- Left column (3 sliders) -->
+      <div class="column">
+        <div class="vcmp"
+             data-left="static/videos/comp1_left.mp4"
+             data-right="static/videos/comp1_right.mp4"
+             data-label-left="Baseline"
+             data-label-right="Ours"></div>
+        <p class="vcmp-caption">Comparison 1: replace with your caption.</p>
+
+        <div class="vcmp"
+             data-left="static/videos/comp2_left.mp4"
+             data-right="static/videos/comp2_right.mp4"
+             data-label-left="Baseline"
+             data-label-right="Ours"></div>
+        <p class="vcmp-caption">Comparison 2: replace with your caption.</p>
+
+        <div class="vcmp"
+             data-left="static/videos/comp3_left.mp4"
+             data-right="static/videos/comp3_right.mp4"
+             data-label-left="Baseline"
+             data-label-right="Ours"></div>
+        <p class="vcmp-caption">Comparison 3: replace with your caption.</p>
       </div>
-      <div class="item">
-        <!-- Your image here -->
-        <img src="static/images/carousel2.jpg" alt="Second research result visualization" loading="lazy"/>
-        <h2 class="subtitle has-text-centered">
-          Second image description.
-        </h2>
+
+      <!-- Right column (3 sliders) -->
+      <div class="column">
+        <div class="vcmp"
+             data-left="static/videos/comp4_left.mp4"
+             data-right="static/videos/comp4_right.mp4"
+             data-label-left="Baseline"
+             data-label-right="Ours"></div>
+        <p class="vcmp-caption">Comparison 4: replace with your caption.</p>
+
+        <div class="vcmp"
+             data-left="static/videos/comp5_left.mp4"
+             data-right="static/videos/comp5_right.mp4"
+             data-label-left="Baseline"
+             data-label-right="Ours"></div>
+        <p class="vcmp-caption">Comparison 5: replace with your caption.</p>
+
+        <div class="vcmp"
+             data-left="static/videos/comp6_left.mp4"
+             data-right="static/videos/comp6_right.mp4"
+             data-label-left="Baseline"
+             data-label-right="Ours"></div>
+        <p class="vcmp-caption">Comparison 6: replace with your caption.</p>
       </div>
-      <div class="item">
-        <!-- Your image here -->
-        <img src="static/images/carousel3.jpg" alt="Third research result visualization" loading="lazy"/>
-        <h2 class="subtitle has-text-centered">
-         Third image description.
-       </h2>
-     </div>
-     <div class="item">
-      <!-- Your image here -->
-      <img src="static/images/carousel4.jpg" alt="Fourth research result visualization" loading="lazy"/>
-      <h2 class="subtitle has-text-centered">
-        Fourth image description.
-      </h2>
-    </div>
-  </div>
-</div>
-</div>
-</section>
-<!-- End image carousel -->
 
-
-
-
-<!-- Youtube video -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <!-- Paper video. -->
-      <h2 class="title is-3">Video Presentation</h2>
-      <div class="columns is-centered has-text-centered">
-        <div class="column is-four-fifths">
-          
-          <div class="publication-video">
-            <!-- TODO: Replace with your YouTube video ID -->
-            <iframe src="https://www.youtube.com/embed/JkaxUblCGz0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </section>
-<!-- End youtube video -->
-
-
-<!-- Video carousel -->
-<section class="hero is-small">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title is-3">Another Carousel</h2>
-      <div id="results-carousel" class="carousel results-carousel">
-        <div class="item item-video1">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video1" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel1.mp4" type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-video2">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video2" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel2.mp4" type="video/mp4">
-          </video>
-        </div>
-        <div class="item item-video3">
-          <!-- TODO: Add poster image for better preview -->
-          <video poster="" id="video3" controls muted loop height="100%" preload="metadata">
-            <!-- Your video file here -->
-            <source src="static/videos/carousel3.mp4" type="video/mp4">
-          </video>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-<!-- End video carousel -->
+<!-- End video comparison sliders -->
 
 
 
 
 
 
-<!-- Paper poster -->
-<section class="hero is-small is-light">
-  <div class="hero-body">
-    <div class="container">
-      <h2 class="title">Poster</h2>
 
-      <!-- TODO: Replace with your poster PDF -->
-      <iframe  src="static/pdfs/sample.pdf" width="100%" height="550">
-          </iframe>
-        
-      </div>
-    </div>
-  </section>
-<!--End paper poster -->
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
 <!--BibTex citation -->
+<!--
+
   <section class="section" id="BibTeX">
     <div class="container is-max-desktop content">
       <div class="bibtex-header">
@@ -489,6 +485,8 @@
 }</code></pre>
     </div>
 </section>
+
+-->
 <!--End BibTex citation -->
 
 
@@ -516,5 +514,124 @@
 
     <!-- End of Statcounter Code -->
 
-  </body>
+  
+  <!-- Video Comparison Slider JS -->
+  <script>
+    (function () {
+      function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+      function buildSlider(root) {
+        const leftSrc = root.getAttribute("data-left");
+        const rightSrc = root.getAttribute("data-right");
+        const labelLeft = root.getAttribute("data-label-left") || "Left";
+        const labelRight = root.getAttribute("data-label-right") || "Right";
+
+        root.innerHTML = `
+          <video class="vcmp-base" muted playsinline preload="metadata" loop autoplay>
+            <source src="${leftSrc}" type="video/mp4">
+          </video>
+          <video class="vcmp-top" muted playsinline preload="metadata" loop autoplay>
+            <source src="${rightSrc}" type="video/mp4">
+          </video>
+          <div class="vcmp-bar" aria-label="Drag to compare">
+            <div class="vcmp-knob">⇆</div>
+          </div>
+          <div class="vcmp-labels">
+            <span>${labelLeft}</span>
+            <span>${labelRight}</span>
+          </div>
+        `;
+
+        const vA = root.querySelector("video.vcmp-base");
+        const vB = root.querySelector("video.vcmp-top");
+        const bar = root.querySelector(".vcmp-bar");
+
+        let dragging = false;
+        let started = false;
+        let syncing = false;
+
+        function setX(clientX) {
+          const r = root.getBoundingClientRect();
+          const x = clamp(clientX - r.left, 0, r.width);
+          const pct = (x / r.width) * 100;
+          vB.style.clipPath = `inset(0 ${100 - pct}% 0 0)`;
+          bar.style.left = `${pct}%`;
+        }
+
+        async function startPlayback() {
+          if (started) return;
+          started = true;
+
+          // Attempt to align at the same time origin (best effort)
+          try { vA.currentTime = 0; vB.currentTime = 0; } catch (e) {}
+
+          // Ensure both are playing (autoplay may already do it; this helps on stricter browsers)
+          try { await vA.play(); } catch (e) {}
+          try { await vB.play(); } catch (e) {}
+
+          // Light time-sync loop (keeps them close without visible jumps)
+          if (!syncing) {
+            syncing = true;
+            const THRESH = 0.050; // 50ms
+            const HARD = 0.250;   // 250ms
+            const ALPHA = 0.12;   // soft correction
+
+            const tick = () => {
+              if (!started) { syncing = false; return; }
+              if (vA.readyState < 2 || vB.readyState < 2) {
+                requestAnimationFrame(tick);
+                return;
+              }
+              const dt = vA.currentTime - vB.currentTime;
+              const adt = Math.abs(dt);
+
+              if (adt > HARD) {
+                try { vB.currentTime = vA.currentTime; } catch (e) {}
+              } else if (adt > THRESH) {
+                try { vB.currentTime += dt * ALPHA; } catch (e) {}
+              }
+              requestAnimationFrame(tick);
+            };
+            requestAnimationFrame(tick);
+          }
+        }
+
+        // Pointer interactions for drag
+        root.addEventListener("pointerdown", (e) => {
+          dragging = true;
+          root.setPointerCapture(e.pointerId);
+          startPlayback();
+          setX(e.clientX);
+        });
+        root.addEventListener("pointermove", (e) => {
+          if (!dragging) return;
+          setX(e.clientX);
+        });
+        root.addEventListener("pointerup", () => { dragging = false; });
+        root.addEventListener("pointercancel", () => { dragging = false; });
+
+        // Click to start playback (in case user doesn't drag)
+        root.addEventListener("click", () => startPlayback(), { passive: true });
+
+        // Initialize at 50/50
+        requestAnimationFrame(() => {
+          const r = root.getBoundingClientRect();
+          setX(r.left + r.width * 0.5);
+        });
+      }
+
+      function initAll() {
+        document.querySelectorAll(".vcmp").forEach(buildSlider);
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", initAll);
+      } else {
+        initAll();
+      }
+    })();
+  </script>
+
+</body>
   </html>
+
