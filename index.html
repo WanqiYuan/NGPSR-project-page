@@ -252,6 +252,43 @@
     @media (prefers-reduced-motion: reduce) {
       .vcmp { scroll-behavior: auto; }
     }
+    .switch-video-wrapper {
+      position: relative;
+      width: 100%;
+    }
+    
+    .switch-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.5);
+      color: white;
+      font-size: 26px;
+      cursor: pointer;
+      z-index: 10;
+      transition: background 0.2s;
+    }
+    
+    .switch-btn:hover {
+      background: rgba(0,0,0,0.8);
+    }
+    
+    .switch-btn.left {
+      left: -60px;
+    }
+    
+    .switch-btn.right {
+      right: -60px;
+    }
+    
+    @media (max-width: 900px) {
+      .switch-btn.left { left: 10px; }
+      .switch-btn.right { right: 10px; }
+    }
   </style>
 
 </head>
@@ -344,25 +381,6 @@
   </div>
 </section>
 
-
-<!-- Teaser video-->
-<section class="hero teaser">
-  <div class="container is-max-desktop">
-    <div class="hero-body">
-      <!-- TODO: Replace with your teaser video -->
-      <video poster="" id="tree" autoplay controls muted loop height="100%" preload="metadata">
-        <!-- TODO: Add your video file path here -->
-        <source src="static/videos/banner_video.mp4" type="video/mp4">
-      </video>
-      <!-- TODO: Replace with your video description -->
-      <h2 class="subtitle has-text-centered">
-        Aliquam vitae elit ullamcorper tellus egestas pellentesque. Ut lacus tellus, maximus vel lectus at, placerat pretium mi. Maecenas dignissim tincidunt vestibulum. Sed consequat hendrerit nisl ut maximus. 
-      </h2>
-    </div>
-  </div>
-</section>
-<!-- End teaser video -->
-
 <!-- Paper abstract -->
 <section class="section hero is-light">
   <div class="container is-max-desktop">
@@ -441,16 +459,30 @@
 </section>
 <!-- End video comparison sliders -->
 
-<!-- Compare on Blender -->
+<!-- Compare on Blender (Arrow Switch Version) -->
 <section class="section">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">compareonblender</h2>
-    <div class="columns is-centered">
-      <div class="column is-10">
-        <video controls muted playsinline loop preload="metadata" style="width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.12); background:#000;">
-          <source src="static/videos/compare_on_blender.mp4" type="video/mp4">
-        </video>
-      </div>
+    <h2 class="title is-3 has-text-centered">Super-resolution on Blender Dataset</h2>
+
+    <div class="switch-video-wrapper">
+
+      <button class="switch-btn left" onclick="switchBlender(-1)">
+        &#10094;
+      </button>
+
+      <video id="blenderVideo"
+             controls
+             muted
+             playsinline
+             preload="metadata"
+             style="width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.12); background:#000;">
+        <source src="static/videos/compare_on_blender_1.mp4" type="video/mp4">
+      </video>
+
+      <button class="switch-btn right" onclick="switchBlender(1)">
+        &#10095;
+      </button>
+
     </div>
   </div>
 </section>
@@ -522,6 +554,29 @@
   
   <!-- Video Comparison Slider JS -->
   <script>
+    const blenderVideos = [
+      "static/videos/blender1.mp4",
+      "static/videos/blender2.mp4"
+    ];
+  
+    let blenderIndex = 0;
+  
+    function switchBlender(direction) {
+      const video = document.getElementById("blenderVideo");
+      blenderIndex += direction;
+  
+      if (blenderIndex < 0) {
+        blenderIndex = blenderVideos.length - 1;
+      }
+      if (blenderIndex >= blenderVideos.length) {
+        blenderIndex = 0;
+      }
+  
+      video.pause();
+      video.src = blenderVideos[blenderIndex];
+      video.load();
+      video.play();
+    }
     (function () {
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
