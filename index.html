@@ -252,11 +252,38 @@
     @media (prefers-reduced-motion: reduce) {
       .vcmp { scroll-behavior: auto; }
     }
+
     .switch-video-wrapper {
       position: relative;
       width: 100%;
     }
-    
+
+    /* NEW: stage + crossfade */
+    .switch-video-stage{
+      position: relative;
+      width: 100%;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      background:#000;
+    }
+    .switch-video{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      transition: opacity 260ms ease;
+      background:#000;
+    }
+    .switch-video.active{
+      position: relative;
+      opacity: 1;
+    }
+    .switch-video.fading-in{
+      opacity: 1;
+    }
+
     .switch-btn {
       position: absolute;
       top: 50%;
@@ -284,7 +311,7 @@
     .switch-btn.right {
       right: -60px;
     }
-    
+
     @media (max-width: 900px) {
       .switch-btn.left { left: 10px; }
       .switch-btn.right { right: 10px; }
@@ -465,24 +492,24 @@
     <h2 class="title is-3 has-text-centered">Super-resolution on Blender Dataset</h2>
 
     <div class="switch-video-wrapper">
-
-      <button class="switch-btn left" onclick="switchBlender(-1)">
+      <button class="switch-btn left" onclick="switchBlender(-1)" aria-label="Previous Blender video">
         &#10094;
       </button>
 
-      <video id="blenderVideo"
-             controls
-             muted
-             playsinline
-             preload="metadata"
-             style="width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.12); background:#000;">
-        <source src="static/videos/compare_on_blender_1.mp4" type="video/mp4">
-      </video>
+      <div class="switch-video-stage" id="blenderStage">
+        <video id="blenderVideoA" class="switch-video active" controls muted playsinline preload="auto"
+               style="width:100%; border-radius:12px; background:#000;">
+          <source src="static/videos/compare_on_blender_1.mp4" type="video/mp4">
+        </video>
+        <video id="blenderVideoB" class="switch-video" controls muted playsinline preload="auto"
+               style="width:100%; border-radius:12px; background:#000;">
+          <source src="static/videos/compare_on_blender_2.mp4" type="video/mp4">
+        </video>
+      </div>
 
-      <button class="switch-btn right" onclick="switchBlender(1)">
+      <button class="switch-btn right" onclick="switchBlender(1)" aria-label="Next Blender video">
         &#10095;
       </button>
-
     </div>
   </div>
 </section>
@@ -490,11 +517,11 @@
 <!-- Compare on DTU -->
 <section class="section">
   <div class="container is-max-desktop">
-    <h2 class="title is-3 has-text-centered">Generalizable Super-resolution on DTU Dataset</h2>
+    <h2 class="title is-3 has-text-centered">compare on dtu</h2>
     <div class="columns is-centered">
       <div class="column is-10">
         <video controls muted playsinline loop preload="metadata" style="width:100%; border-radius:12px; box-shadow:0 10px 30px rgba(0,0,0,0.12); background:#000;">
-          <source src="static/videos/dtu.mp4" type="video/mp4">
+          <source src="static/videos/compare_on_dtu.mp4" type="video/mp4">
         </video>
       </div>
     </div>
@@ -554,29 +581,80 @@
   
   <!-- Video Comparison Slider JS -->
   <script>
+    // Blender dataset videos (edit paths as needed)
     const blenderVideos = [
-      "static/videos/blender1.mp4",
-      "static/videos/blender2.mp4"
+      "static/videos/compare_on_blender_1.mp4",
+      "static/videos/compare_on_blender_2.mp4"
+      // "static/videos/compare_on_blender_3.mp4"
     ];
-  
+
     let blenderIndex = 0;
-  
-    function switchBlender(direction) {
-      const video = document.getElementById("blenderVideo");
-      blenderIndex += direction;
-  
-      if (blenderIndex < 0) {
-        blenderIndex = blenderVideos.length - 1;
+    let blenderBusy = false;
+
+    function setVideoSource(videoEl, src) {
+      let source = videoEl.querySelector("source");
+      if (!source) {
+        source = document.createElement("source");
+        source.type = "video/mp4";
+        videoEl.appendChild(source);
       }
-      if (blenderIndex >= blenderVideos.length) {
-        blenderIndex = 0;
-      }
-  
-      video.pause();
-      video.src = blenderVideos[blenderIndex];
-      video.load();
-      video.play();
+      source.src = src;
+      videoEl.load();
     }
+
+    async function switchBlender(direction) {
+      if (blenderBusy) return;
+      blenderBusy = true;
+
+      const vA = document.getElementById("blenderVideoA");
+      const vB = document.getElementById("blenderVideoB");
+      if (!vA || !vB) { blenderBusy = false; return; }
+
+      const active = vA.classList.contains("active") ? vA : vB;
+      const standby = (active === vA) ? vB : vA;
+
+      blenderIndex = (blenderIndex + direction) % blenderVideos.length;
+      if (blenderIndex < 0) blenderIndex += blenderVideos.length;
+
+      const nextSrc = blenderVideos[blenderIndex];
+
+      const wasPlaying = !active.paused;
+      const keepTime = active.currentTime || 0;
+
+      standby.classList.remove("active", "fading-in");
+      standby.style.opacity = 0;
+      setVideoSource(standby, nextSrc);
+
+      await new Promise((resolve) => {
+        const onReady = () => resolve();
+        standby.addEventListener("loadeddata", onReady, { once: true });
+      });
+
+      // Optional: keep time aligned (comment out to always start from 0)
+      try { standby.currentTime = keepTime; } catch(e) {}
+
+      if (wasPlaying) {
+        try { await standby.play(); } catch(e) {}
+      }
+
+      // Cross-fade
+      standby.classList.add("fading-in");
+      active.style.opacity = 0;
+
+      setTimeout(() => {
+        try { active.pause(); } catch(e) {}
+        active.classList.remove("active", "fading-in");
+        active.style.opacity = 0;
+
+        standby.classList.remove("fading-in");
+        standby.classList.add("active");
+        standby.style.opacity = 1;
+
+        active.style.opacity = "";
+        blenderBusy = false;
+      }, 280);
+    }
+
     (function () {
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
@@ -622,7 +700,7 @@
           if (started) return;
           started = true;
 
-          // Do NOT reset currentTime here. We only try to play (autoplay may be blocked until user gesture).
+          // Do NOT reset currentTime here.
           try { await vA.play(); } catch (e) {}
           try { await vB.play(); } catch (e) {}
 
@@ -634,7 +712,7 @@
             }
           } catch (e) {}
 
-          // Light time-sync loop (keeps them close without visible jumps)
+          // Light time-sync loop
           if (!syncing) {
             syncing = true;
             const THRESH = 0.050; // 50ms
@@ -675,7 +753,7 @@
         root.addEventListener("pointerup", () => { dragging = false; });
         root.addEventListener("pointercancel", () => { dragging = false; });
 
-        // Click to start playback (in case user doesn't drag)
+        // Click to start playback
         root.addEventListener("click", () => startPlayback(), { passive: true });
 
         // Initialize at 50/50
